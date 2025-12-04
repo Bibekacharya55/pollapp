@@ -3,7 +3,9 @@ from .models import Question, Choice
 from django.http import HttpResponseRedirect, HttpResponse
 from django.db.models import F
 from django.urls import reverse
-from django.views import generic
+from django.views import View, generic
+
+from .forms import VoteForm
 
 
 # Create your views here.
@@ -21,29 +23,54 @@ class DetailView(generic.DetailView):
     template_name = "detail.html"
 
 
+
+
 class ResultsView(generic.DetailView):
     model = Question
     template_name = "result.html"
 
 
-def vote(request, question_idd):
-    question = get_object_or_404(Question, pk=question_idd)
-    try:
-        selected_choice = question.choices.get(pk=request.POST["choice"])
-    except (KeyError, Choice.DoesNotExist):
+
+class voteView(generic.CreateView):
+    model = Question
+    template_name = "detail.html"
+    form_class = VoteForm
+
+    def post(self,request, pk):
+        question = get_object_or_404(Question, pk=pk)
+        try:
+            selected_choice = question.choices.get(pk=request.POST["choice"])
+        except (KeyError, Choice.DoesNotExist):
         # Redisplay the question voting form.
-        return render(
-            request,
-            "detail.html",
+         return render(request,"detail.html",
             {
                 "question": question,
                 "error_message": "You didn't select a choice.",
             },
         )
-    else:
-        selected_choice.votes = F("votes") + 1
+        else:
+            selected_choice.votes = F("votes") + 1
         selected_choice.save()
         return HttpResponseRedirect(reverse("result", args=(question.id,)))
+
+# def vote(request, pk):
+#     question = get_object_or_404(Question, pk=pk)
+#     try:
+#         selected_choice = question.choices.get(pk=request.POST["choice"])
+#     except (KeyError, Choice.DoesNotExist):
+#         # Redisplay the question voting form.
+#         return render(
+#             request,
+#             "detail.html",
+#             {
+#                 "question": question,
+#                 "error_message": "You didn't select a choice.",
+#             },
+#         )
+#     else:
+#         selected_choice.votes = F("votes") + 1
+#         selected_choice.save()
+#         return HttpResponseRedirect(reverse("result", args=(question.id,)))
 
 
 

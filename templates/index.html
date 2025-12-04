@@ -3,8 +3,8 @@
 <link rel="stylesheet" href="{% static 'style.css' %}">
 {% if object_list %}
     <ul>
-    {% for question in object_list %}
-        <li><a href="{{ question.id }}">{{ question.pub_date }}</a></li>
+    {% for x in object_list %}
+        <li><a href="{{ x.id }}">{{ x.question_txt}}</a></li>
     {% endfor %}
     </ul>
 {% else %}

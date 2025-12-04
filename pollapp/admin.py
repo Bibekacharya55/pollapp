@@ -9,12 +9,16 @@ class ChoiceInline(admin.TabularInline):
     extra = 3
 
 class QuestionAdmin(admin.ModelAdmin):
-    fieldsets = [
+     fieldsets = [
         (None, {"fields": ["question_txt"]}),
         ("Date information", {"fields": ["pub_date"], "classes": ["collapse"]}),
     ]
-    inlines = [ChoiceInline]
-    list_display = ["question_txt", "pub_date", "was_published_recently"]
+     inlines = [ChoiceInline]
+     list_display = ["question_txt", "pub_date", "was_published_recently"]
+     def was_published_recently(self):
+        now = timezone.now()
+        return now - datetime.timedelta(days=1) <= self.pub_date <= now
+     
 
 admin.site.register(Choice)
 admin.site.register(Question, QuestionAdmin)
